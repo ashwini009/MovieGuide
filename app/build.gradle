@@ -52,6 +52,7 @@ dependencies {
     compile 'net.jcip:jcip-annotations:1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.moshi:moshi:1.1.0'
+    compile 'com.jakewharton:butterknife:7.0.1'
 
     // Dependency Injection
     apt 'com.google.dagger:dagger-compiler:2.5'

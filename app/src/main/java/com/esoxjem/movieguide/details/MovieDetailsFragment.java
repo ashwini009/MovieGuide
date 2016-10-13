@@ -33,6 +33,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static com.esoxjem.movieguide.R.id.trailers_label;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -41,18 +47,34 @@ public class MovieDetailsFragment extends Fragment implements IMovieDetailsView,
     @Inject
     IMovieDetailsPresenter movieDetailsPresenter;
 
-    private ImageView poster;
-    private TextView title;
-    private TextView releaseDate;
-    private TextView rating;
-    private TextView overview;
-    private TextView label;
-    private HorizontalScrollView horizontalScrollView;
-    private LinearLayout trailers;
-    private TextView reviews;
-    private LinearLayout reviewsContainer;
-    private FloatingActionButton favorite;
-    private Movie movie;
+    @Bind(R.id.movie_poster)
+    ImageView poster;
+    @Bind(R.id.movie_name)
+    TextView title;
+    @Bind(R.id.movie_year)
+    TextView releaseDate;
+    @Bind(R.id.movie_rating)
+    TextView rating;
+    @Bind(R.id.movie_description)
+    TextView overview;
+    @Bind(trailers_label)
+    TextView label;
+    @Bind(R.id.trailers_container)
+    HorizontalScrollView horizontalScrollView;
+    @Bind(R.id.trailers)
+    LinearLayout trailers;
+    @Bind(R.id.reviews_label)
+    TextView reviews;
+    @Bind(R.id.reviews)
+    LinearLayout reviewsContainer;
+    @Bind(R.id.favorite)
+    FloatingActionButton favorite;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+    @Bind(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsingToolbarLayout;
+
+    Movie movie;
 
     public MovieDetailsFragment()
     {
@@ -82,8 +104,8 @@ public class MovieDetailsFragment extends Fragment implements IMovieDetailsView,
                              Bundle savedInstanceState)
     {
         View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
-        setToolbar(rootView);
-        initLayoutReferences(rootView);
+        ButterKnife.bind(this, rootView);
+        setToolbar();
         return rootView;
     }
 
@@ -103,33 +125,14 @@ public class MovieDetailsFragment extends Fragment implements IMovieDetailsView,
         }
     }
 
-    private void initLayoutReferences(View rootView)
+    private void setToolbar()
     {
-        poster = (ImageView) rootView.findViewById(R.id.movie_poster);
-        title = (TextView) rootView.findViewById(R.id.movie_name);
-        releaseDate = (TextView) rootView.findViewById(R.id.movie_year);
-        rating = (TextView) rootView.findViewById(R.id.movie_rating);
-        overview = (TextView) rootView.findViewById(R.id.movie_description);
-        label = (TextView) rootView.findViewById(R.id.trailers_label);
-        horizontalScrollView = (HorizontalScrollView) rootView.findViewById(R.id.trailers_container);
-        trailers = (LinearLayout) rootView.findViewById(R.id.trailers);
-        reviews = (TextView) rootView.findViewById(R.id.reviews_label);
-        reviewsContainer = (LinearLayout) rootView.findViewById(R.id.reviews);
-        favorite = (FloatingActionButton) rootView.findViewById(R.id.favorite);
-        favorite.setOnClickListener(this);
-    }
-
-    private void setToolbar(View rootView)
-    {
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
-
         collapsingToolbarLayout.setContentScrimColor(getResources().getColor(R.color.colorPrimary));
         collapsingToolbarLayout.setTitle(getString(R.string.movie_details));
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedToolbar);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedToolbar);
         collapsingToolbarLayout.setTitleEnabled(true);
 
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         if (toolbar != null)
         {
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -245,6 +248,12 @@ public class MovieDetailsFragment extends Fragment implements IMovieDetailsView,
         }
     }
 
+    @OnClick(R.id.favorite)
+    public void onFavouriteClicked()
+    {
+        onFavoriteClick();
+    }
+
     @Override
     public void onClick(View view)
     {
@@ -256,10 +265,6 @@ public class MovieDetailsFragment extends Fragment implements IMovieDetailsView,
 
             case R.id.review_content:
                 onReviewClick((TextView) view);
-                break;
-
-            case R.id.favorite:
-                onFavoriteClick();
                 break;
 
             default:

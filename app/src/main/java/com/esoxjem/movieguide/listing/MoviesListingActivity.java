@@ -12,16 +12,23 @@ import com.esoxjem.movieguide.details.MovieDetailsActivity;
 import com.esoxjem.movieguide.details.MovieDetailsFragment;
 import com.esoxjem.movieguide.Movie;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class MoviesListingActivity extends AppCompatActivity implements MoviesListingFragment.Callback
 {
     public static final String DETAILS_FRAGMENT = "DetailsFragment";
     private boolean twoPaneMode;
+
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         setToolbar();
 
         if (findViewById(R.id.movie_details_container) != null)
@@ -42,7 +49,6 @@ public class MoviesListingActivity extends AppCompatActivity implements MoviesLi
 
     private void setToolbar()
     {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null)
