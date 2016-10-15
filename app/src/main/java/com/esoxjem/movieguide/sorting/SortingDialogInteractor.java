@@ -1,7 +1,5 @@
 package com.esoxjem.movieguide.sorting;
 
-import javax.inject.Inject;
-
 /**
  * @author arun
  */
@@ -9,7 +7,6 @@ public class SortingDialogInteractor implements ISortingDialogInteractor
 {
     private SortingOptionStore sortingOptionStore;
 
-    @Inject
     public SortingDialogInteractor(SortingOptionStore store)
     {
         sortingOptionStore = store;

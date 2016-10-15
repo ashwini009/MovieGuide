@@ -1,12 +1,10 @@
 package com.esoxjem.movieguide.details;
 
-import com.esoxjem.movieguide.Movie;
-import com.esoxjem.movieguide.Review;
-import com.esoxjem.movieguide.Video;
-import com.esoxjem.movieguide.favorites.IFavoritesInteractor;
-import com.esoxjem.movieguide.util.RxUtils;
+import android.support.annotation.NonNull;
 
-import java.util.List;
+import com.esoxjem.movieguide.favorites.IFavoritesInteractor;
+import com.esoxjem.movieguide.listing.Movie;
+import com.esoxjem.movieguide.util.RxUtils;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -19,14 +17,14 @@ import rx.schedulers.Schedulers;
 public class MovieDetailsPresenter implements IMovieDetailsPresenter
 {
     private IMovieDetailsView view;
-    private IMovieDetailsInteractor movieDetailsInteractor;
     private IFavoritesInteractor favoritesInteractor;
     private Subscription trailersSubscription;
     private Subscription reviewSubscription;
+    private IMovieDetailsEndpoint movieDetailsEndpoint;
 
-    public MovieDetailsPresenter(IMovieDetailsInteractor movieDetailsInteractor, IFavoritesInteractor favoritesInteractor)
+    public MovieDetailsPresenter(IMovieDetailsEndpoint movieDetailsEndpoint, IFavoritesInteractor favoritesInteractor)
     {
-        this.movieDetailsInteractor = movieDetailsInteractor;
+        this.movieDetailsEndpoint = movieDetailsEndpoint;
         this.favoritesInteractor = favoritesInteractor;
     }
 
@@ -60,28 +58,27 @@ public class MovieDetailsPresenter implements IMovieDetailsPresenter
     @Override
     public void showTrailers(Movie movie)
     {
-        trailersSubscription = movieDetailsInteractor.getTrailers(movie.getId()).subscribeOn(Schedulers.io())
+        trailersSubscription = movieDetailsEndpoint.getMovieTrailers(movie.getId())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Video>>()
+                .subscribe(new Subscriber<VideoViewModel>()
                 {
                     @Override
                     public void onCompleted()
                     {
-
                     }
 
                     @Override
                     public void onError(Throwable e)
                     {
-
                     }
 
                     @Override
-                    public void onNext(List<Video> videos)
+                    public void onNext(@NonNull VideoViewModel videoViewModel)
                     {
                         if (isViewAttached())
                         {
-                            view.showTrailers(videos);
+                            view.showTrailers(videoViewModel.getVideos());
                         }
                     }
                 });
@@ -90,28 +87,27 @@ public class MovieDetailsPresenter implements IMovieDetailsPresenter
     @Override
     public void showReviews(Movie movie)
     {
-        reviewSubscription = movieDetailsInteractor.getReviews(movie.getId()).subscribeOn(Schedulers.io())
+        reviewSubscription = movieDetailsEndpoint.getMovieReviews(movie.getId())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Review>>()
+                .subscribe(new Subscriber<ReviewViewModel>()
                 {
                     @Override
                     public void onCompleted()
                     {
-
                     }
 
                     @Override
                     public void onError(Throwable e)
                     {
-
                     }
 
                     @Override
-                    public void onNext(List<Review> reviews)
+                    public void onNext(@NonNull ReviewViewModel reviewViewModel)
                     {
                         if (isViewAttached())
                         {
-                            view.showReviews(reviews);
+                            view.showReviews(reviewViewModel.getReviews());
                         }
                     }
                 });

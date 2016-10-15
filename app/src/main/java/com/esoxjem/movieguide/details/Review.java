@@ -1,4 +1,4 @@
-package com.esoxjem.movieguide;
+package com.esoxjem.movieguide.details;
 
 import android.os.Parcel;
 import android.os.Parcelable;

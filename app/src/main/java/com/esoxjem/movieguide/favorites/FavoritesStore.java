@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.esoxjem.movieguide.BaseApplication;
-import com.esoxjem.movieguide.Movie;
+import com.esoxjem.movieguide.listing.Movie;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 

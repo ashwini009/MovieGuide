@@ -2,10 +2,10 @@ package com.esoxjem.movieguide.details;
 
 import com.esoxjem.movieguide.ActivityScope;
 import com.esoxjem.movieguide.favorites.IFavoritesInteractor;
-import com.esoxjem.movieguide.network.RequestHandler;
 
 import dagger.Module;
 import dagger.Provides;
+import retrofit2.Retrofit;
 
 /**
  * @author pulkitkumar
@@ -28,18 +28,19 @@ public class DetailsModule
         return movieDetailsFragment;
     }
 
+
     @Provides
     @ActivityScope
-    IMovieDetailsInteractor provideInteractor(RequestHandler requestHandler)
+    IMovieDetailsPresenter providePresenter(IMovieDetailsEndpoint movieDetailsEndpoint,
+                                            IFavoritesInteractor favoritesInteractor)
     {
-        return new MovieDetailsInteractor(requestHandler);
+        return new MovieDetailsPresenter(movieDetailsEndpoint, favoritesInteractor);
     }
 
     @Provides
     @ActivityScope
-    IMovieDetailsPresenter providePresenter(IMovieDetailsInteractor detailsInteractor,
-                                            IFavoritesInteractor favoritesInteractor)
+    IMovieDetailsEndpoint provideMovieDetailsEndpoint(Retrofit retrofit)
     {
-        return new MovieDetailsPresenter(detailsInteractor, favoritesInteractor);
+        return retrofit.create(IMovieDetailsEndpoint.class);
     }
 }

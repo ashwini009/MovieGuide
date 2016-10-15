@@ -4,14 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.esoxjem.movieguide.Movie;
+import com.esoxjem.movieguide.Api;
 import com.esoxjem.movieguide.R;
 
 import java.util.List;
@@ -43,17 +42,10 @@ public class MoviesListingAdapter extends RecyclerView.Adapter<MovieListingHolde
     public void onBindViewHolder(final MovieListingHolder holder, int position)
     {
         final Movie movie = movies.get(position);
-        holder.itemView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                callback.onMovieClicked(movie);
-            }
-        });
+        holder.itemView.setOnClickListener(view -> callback.onMovieClicked(movie));
 
         holder.name.setText(movie.getTitle());
-        Glide.with(context).load(movie.getPosterPath())
+        Glide.with(context).load(Api.POSTER_PATH + movie.getPosterPath())
                 .asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .into(new BitmapImageViewTarget(holder.poster)
@@ -63,15 +55,8 @@ public class MoviesListingAdapter extends RecyclerView.Adapter<MovieListingHolde
                     {
                         super.onResourceReady(bitmap, anim);
 
-                        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener()
-                        {
-                            @Override
-                            public void onGenerated(Palette palette)
-                            {
-                                holder.titleBackground.setBackgroundColor(palette.getVibrantColor(context
-                                        .getResources().getColor(R.color.black_translucent_60)));
-                            }
-                        });
+                        Palette.from(bitmap).generate(palette -> holder.titleBackground.setBackgroundColor(palette.getVibrantColor(context
+                                .getResources().getColor(R.color.black_translucent_60))));
                     }
                 });
     }

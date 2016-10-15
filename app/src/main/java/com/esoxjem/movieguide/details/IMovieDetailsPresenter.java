@@ -1,8 +1,6 @@
 package com.esoxjem.movieguide.details;
 
-import com.esoxjem.movieguide.Movie;
-
-import rx.Subscription;
+import com.esoxjem.movieguide.listing.Movie;
 
 /**
  * @author arun

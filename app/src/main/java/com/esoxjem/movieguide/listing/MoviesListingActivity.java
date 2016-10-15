@@ -7,10 +7,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 
 import com.esoxjem.movieguide.R;
-import com.esoxjem.movieguide.Constants;
+import com.esoxjem.movieguide.constants.Constants;
 import com.esoxjem.movieguide.details.MovieDetailsActivity;
 import com.esoxjem.movieguide.details.MovieDetailsFragment;
-import com.esoxjem.movieguide.Movie;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

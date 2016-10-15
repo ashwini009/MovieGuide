@@ -4,11 +4,11 @@ import android.content.Context;
 
 import com.esoxjem.movieguide.ActivityScope;
 import com.esoxjem.movieguide.favorites.IFavoritesInteractor;
-import com.esoxjem.movieguide.network.RequestHandler;
 import com.esoxjem.movieguide.sorting.SortingOptionStore;
 
 import dagger.Module;
 import dagger.Provides;
+import retrofit2.Retrofit;
 
 /**
  * @author pulkitkumar
@@ -33,18 +33,16 @@ public class ListingModule
 
     @Provides
     @ActivityScope
-    IMoviesListingInteractor provideMovieListingInteractor(IFavoritesInteractor favoritesInteractor,
-                                                           RequestHandler requestHandler,
-                                                           SortingOptionStore sortingOptionStore)
+    IMoviesListingPresenter provideMovieListingPresenter(IMovieListingEndpoint movieListingEndpoint, SortingOptionStore sortingOptionStore, IFavoritesInteractor favoritesInteractor)
     {
-        return new MoviesListingInteractor(favoritesInteractor, requestHandler, sortingOptionStore);
+        return new MoviesListingPresenter(movieListingEndpoint, sortingOptionStore, favoritesInteractor);
     }
 
     @Provides
     @ActivityScope
-    IMoviesListingPresenter provideMovieListingPresenter(IMoviesListingInteractor interactor)
+    IMovieListingEndpoint provideMovieListingEndpoint(Retrofit retrofit)
     {
-        return new MoviesListingPresenter(interactor);
+        return retrofit.create(IMovieListingEndpoint.class);
     }
 
     @Provides

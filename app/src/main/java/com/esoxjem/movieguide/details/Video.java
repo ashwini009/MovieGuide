@@ -1,7 +1,11 @@
-package com.esoxjem.movieguide;
+package com.esoxjem.movieguide.details;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.esoxjem.movieguide.Api;
+import com.esoxjem.movieguide.constants.Constants;
+import com.squareup.moshi.Json;
 
 /**
  * @author arun
@@ -10,11 +14,17 @@ public class Video implements Parcelable
 {
     public static final String SITE_YOUTUBE = "YouTube";
 
+    @Json(name = "id")
     private String id;
+    @Json(name = "name")
     private String name;
+    @Json(name = "site")
     private String site;
+    @Json(name = "key")
     private String videoId;
+    @Json(name = "size")
     private int size;
+    @Json(name = "type")
     private String type;
 
     public Video()

@@ -1,16 +1,25 @@
-package com.esoxjem.movieguide;
+package com.esoxjem.movieguide.listing;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.squareup.moshi.Json;
+
 public class Movie implements Parcelable
 {
+    @Json(name = "id")
     private String id;
+    @Json(name = "overview")
     private String overview;
+    @Json(name = "release_date")
     private String releaseDate;
+    @Json(name = "poster_path")
     private String posterPath;
+    @Json(name = "backdrop_path")
     private String backdropPath;
+    @Json(name = "title")
     private String title;
+    @Json(name = "vote_average")
     private double voteAverage;
 
     public Movie()

@@ -1,14 +1,13 @@
 package com.esoxjem.movieguide.listing;
 
-import com.esoxjem.movieguide.Movie;
+import com.esoxjem.movieguide.favorites.IFavoritesInteractor;
+import com.esoxjem.movieguide.sorting.SortType;
+import com.esoxjem.movieguide.sorting.SortingOptionStore;
 import com.esoxjem.movieguide.util.RxUtils;
-
-import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
 import rx.schedulers.Schedulers;
 
 /**
@@ -17,12 +16,17 @@ import rx.schedulers.Schedulers;
 public class MoviesListingPresenter implements IMoviesListingPresenter
 {
     private IMoviesListingView view;
-    private IMoviesListingInteractor moviesInteractor;
-    private Subscription fetchSubscription;
+    private Subscription popularMoviesSubscription;
+    private Subscription highestRatedMoviesSubscription;
+    private IMovieListingEndpoint movieListingEndpoint;
+    private SortingOptionStore sortingOptionStore;
+    private IFavoritesInteractor favoritesInteractor;
 
-    public MoviesListingPresenter(IMoviesListingInteractor interactor)
+    public MoviesListingPresenter(IMovieListingEndpoint movieListingEndpoint, SortingOptionStore sortingOptionStore, IFavoritesInteractor favoritesInteractor)
     {
-        moviesInteractor = interactor;
+        this.movieListingEndpoint = movieListingEndpoint;
+        this.sortingOptionStore = sortingOptionStore;
+        this.favoritesInteractor = favoritesInteractor;
     }
 
     @Override
@@ -35,26 +39,37 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
     public void destroy()
     {
         view = null;
-        RxUtils.unsubscribe(fetchSubscription);
+        RxUtils.unsubscribe(popularMoviesSubscription, highestRatedMoviesSubscription);
     }
 
     @Override
     public void displayMovies()
     {
-        fetchSubscription = moviesInteractor.fetchMovies().subscribeOn(Schedulers.io())
+        int selectedOption = sortingOptionStore.getSelectedOption();
+        if (selectedOption == SortType.MOST_POPULAR.getValue())
+        {
+            loadPopularMovies();
+        } else if (selectedOption == SortType.HIGHEST_RATED.getValue())
+        {
+            loadHighestRatedMovies();
+        } else
+        {
+            loadFavouriteMovies();
+        }
+    }
+
+    private void loadPopularMovies()
+    {
+        popularMoviesSubscription = movieListingEndpoint.fetchPopularMovies()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(new Action0()
-                {
-                    @Override
-                    public void call()
+                .doOnSubscribe(() -> {
+                    if (isViewAttached())
                     {
-                        if (isViewAttached())
-                        {
-                            view.loadingStarted();
-                        }
+                        view.loadingStarted();
                     }
                 })
-                .subscribe(new Subscriber<List<Movie>>()
+                .subscribe(new Subscriber<MovieViewModel>()
                 {
                     @Override
                     public void onCompleted()
@@ -69,11 +84,49 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
                     }
 
                     @Override
-                    public void onNext(List<Movie> movies)
+                    public void onNext(MovieViewModel movieViewModel)
                     {
-                        view.showMovies(movies);
+                        view.showMovies(movieViewModel.getMovies());
                     }
                 });
+    }
+
+    private void loadHighestRatedMovies()
+    {
+        highestRatedMoviesSubscription = movieListingEndpoint.fetchHighestRatedMovies()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(() -> {
+                    if (isViewAttached())
+                    {
+                        view.loadingStarted();
+                    }
+                })
+                .subscribe(new Subscriber<MovieViewModel>()
+                {
+                    @Override
+                    public void onCompleted()
+                    {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+                        view.loadingFailed(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(MovieViewModel movieViewModel)
+                    {
+                        view.showMovies(movieViewModel.getMovies());
+                    }
+                });
+    }
+
+    private void loadFavouriteMovies()
+    {
+        view.showMovies(favoritesInteractor.getFavorites());
     }
 
     private boolean isViewAttached()

@@ -21,12 +21,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.esoxjem.movieguide.Api;
 import com.esoxjem.movieguide.BaseApplication;
-import com.esoxjem.movieguide.Constants;
-import com.esoxjem.movieguide.Movie;
 import com.esoxjem.movieguide.R;
-import com.esoxjem.movieguide.Review;
-import com.esoxjem.movieguide.Video;
+import com.esoxjem.movieguide.constants.Constants;
+import com.esoxjem.movieguide.listing.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -151,7 +150,7 @@ public class MovieDetailsFragment extends Fragment implements IMovieDetailsView,
     @Override
     public void showDetails(Movie movie)
     {
-        Glide.with(getContext()).load(movie.getBackdropPath()).into(poster);
+        Glide.with(getContext()).load(Api.BACKDROP_PATH + movie.getBackdropPath()).into(poster);
         title.setText(movie.getTitle());
         releaseDate.setText(String.format(getString(R.string.release_date), movie.getReleaseDate()));
         rating.setText(String.format(getString(R.string.rating), String.valueOf(movie.getVoteAverage())));
