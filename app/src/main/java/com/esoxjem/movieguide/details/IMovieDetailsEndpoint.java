@@ -1,8 +1,8 @@
 package com.esoxjem.movieguide.details;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import rx.Observable;
 
 /**
  * @author Ashwini Kumar.

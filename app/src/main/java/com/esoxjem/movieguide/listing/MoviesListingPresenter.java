@@ -3,12 +3,11 @@ package com.esoxjem.movieguide.listing;
 import com.esoxjem.movieguide.favorites.IFavoritesInteractor;
 import com.esoxjem.movieguide.sorting.SortType;
 import com.esoxjem.movieguide.sorting.SortingOptionStore;
-import com.esoxjem.movieguide.util.RxUtils;
 
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author arun
@@ -16,8 +15,7 @@ import rx.schedulers.Schedulers;
 public class MoviesListingPresenter implements IMoviesListingPresenter
 {
     private IMoviesListingView view;
-    private Subscription popularMoviesSubscription;
-    private Subscription highestRatedMoviesSubscription;
+    private CompositeDisposable compositeDisposable;
     private IMovieListingEndpoint movieListingEndpoint;
     private SortingOptionStore sortingOptionStore;
     private IFavoritesInteractor favoritesInteractor;
@@ -27,6 +25,7 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
         this.movieListingEndpoint = movieListingEndpoint;
         this.sortingOptionStore = sortingOptionStore;
         this.favoritesInteractor = favoritesInteractor;
+        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -39,7 +38,7 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
     public void destroy()
     {
         view = null;
-        RxUtils.unsubscribe(popularMoviesSubscription, highestRatedMoviesSubscription);
+        compositeDisposable.clear();
     }
 
     @Override
@@ -60,19 +59,19 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
 
     private void loadPopularMovies()
     {
-        popularMoviesSubscription = movieListingEndpoint.fetchPopularMovies()
+        compositeDisposable.add(movieListingEndpoint.fetchPopularMovies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(() -> {
+                .doOnSubscribe(disposable -> {
                     if (isViewAttached())
                     {
                         view.loadingStarted();
                     }
                 })
-                .subscribe(new Subscriber<MovieViewModel>()
+                .subscribeWith(new DisposableObserver<MovieViewModel>()
                 {
                     @Override
-                    public void onCompleted()
+                    public void onComplete()
                     {
 
                     }
@@ -88,24 +87,24 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
                     {
                         view.showMovies(movieViewModel.getMovies());
                     }
-                });
+                }));
     }
 
     private void loadHighestRatedMovies()
     {
-        highestRatedMoviesSubscription = movieListingEndpoint.fetchHighestRatedMovies()
+        compositeDisposable.add(movieListingEndpoint.fetchHighestRatedMovies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(() -> {
+                .doOnSubscribe(disposable -> {
                     if (isViewAttached())
                     {
                         view.loadingStarted();
                     }
                 })
-                .subscribe(new Subscriber<MovieViewModel>()
+                .subscribeWith(new DisposableObserver<MovieViewModel>()
                 {
                     @Override
-                    public void onCompleted()
+                    public void onComplete()
                     {
 
                     }
@@ -121,7 +120,7 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
                     {
                         view.showMovies(movieViewModel.getMovies());
                     }
-                });
+                }));
     }
 
     private void loadFavouriteMovies()

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.File;
 import java.net.CookieHandler;
@@ -16,14 +17,13 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cache;
 import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
-import rx.schedulers.Schedulers;
 
 /**
  * @author Ashwini Kumar.
@@ -90,14 +90,14 @@ public class NetworkModule
 
     @Provides
     @Singleton
-    RxJavaCallAdapterFactory provideRxJavaCallAdapterFactory()
+    RxJava2CallAdapterFactory provideRxJavaCallAdapterFactory()
     {
-        return RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
+        return RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io());
     }
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(OkHttpClient okHttpClient, RxJavaCallAdapterFactory rxAdapter)
+    Retrofit provideRetrofit(OkHttpClient okHttpClient, RxJava2CallAdapterFactory rxAdapter)
     {
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
