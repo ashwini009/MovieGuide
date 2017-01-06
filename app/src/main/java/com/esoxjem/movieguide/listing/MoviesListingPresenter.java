@@ -6,7 +6,6 @@ import com.esoxjem.movieguide.sorting.SortingOptionStore;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -68,26 +67,30 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
                         view.loadingStarted();
                     }
                 })
-                .subscribeWith(new DisposableObserver<MovieViewModel>()
-                {
-                    @Override
-                    public void onComplete()
-                    {
+                .subscribe(this::onMoviewsResult, this::onError));
+    }
 
-                    }
+    private void onMoviewsResult(MovieViewModel movieViewModel)
+    {
+        if (isViewAttached())
+        {
+            view.showMovies(movieViewModel.getMovies());
+        } else
+        {
+            // do nothing
+        }
+    }
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        view.loadingFailed(e.getMessage());
-                    }
 
-                    @Override
-                    public void onNext(MovieViewModel movieViewModel)
-                    {
-                        view.showMovies(movieViewModel.getMovies());
-                    }
-                }));
+    private void onError(Throwable throwable)
+    {
+        if (isViewAttached())
+        {
+            view.loadingFailed(throwable.getMessage());
+        } else
+        {
+            // do nothing
+        }
     }
 
     private void loadHighestRatedMovies()
@@ -101,26 +104,7 @@ public class MoviesListingPresenter implements IMoviesListingPresenter
                         view.loadingStarted();
                     }
                 })
-                .subscribeWith(new DisposableObserver<MovieViewModel>()
-                {
-                    @Override
-                    public void onComplete()
-                    {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-                        view.loadingFailed(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(MovieViewModel movieViewModel)
-                    {
-                        view.showMovies(movieViewModel.getMovies());
-                    }
-                }));
+                .subscribe(this::onMoviewsResult, this::onError));
     }
 
     private void loadFavouriteMovies()

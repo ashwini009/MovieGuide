@@ -5,7 +5,6 @@ import com.esoxjem.movieguide.listing.Movie;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -58,31 +57,24 @@ public class MovieDetailsPresenter implements IMovieDetailsPresenter
         compositeDisposable.add(movieDetailsEndpoint.getMovieTrailers(movie.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<VideoViewModel>()
-                {
-                    @Override
-                    public void onNext(VideoViewModel videoViewModel)
-                    {
-                        if (isViewAttached())
-                        {
-                            view.showTrailers(videoViewModel.getVideos());
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-
-                    }
-
-                    @Override
-                    public void onComplete()
-                    {
-
-                    }
-                }));
+                .subscribe(this::onTrailersResult, throwable -> onError()));
     }
 
+    private void onError()
+    {
+        // do nothing
+    }
+
+    private void onTrailersResult(VideoViewModel videoViewModel)
+    {
+        if (isViewAttached())
+        {
+            view.showTrailers(videoViewModel.getVideos());
+        } else
+        {
+            // do nothing
+        }
+    }
 
     @Override
     public void showReviews(Movie movie)
@@ -90,30 +82,20 @@ public class MovieDetailsPresenter implements IMovieDetailsPresenter
         compositeDisposable.add(movieDetailsEndpoint.getMovieReviews(movie.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<ReviewViewModel>()
-                {
-                    @Override
-                    public void onNext(ReviewViewModel reviewViewModel)
-                    {
-                        if (isViewAttached())
-                        {
-                            view.showReviews(reviewViewModel.getReviews());
-                        }
-                    }
+                .subscribe(this::onReviewsResult, throwable -> onError()));
 
-                    @Override
-                    public void onError(Throwable e)
-                    {
+    }
 
-                    }
+    private void onReviewsResult(ReviewViewModel reviewViewModel)
+    {
 
-                    @Override
-                    public void onComplete()
-                    {
-
-                    }
-                }));
-
+        if (isViewAttached())
+        {
+            view.showReviews(reviewViewModel.getReviews());
+        } else
+        {
+            // do nothing
+        }
     }
 
     @Override
